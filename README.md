@@ -24,11 +24,14 @@ Each country has its own HTML structure, requiring different parsing logic.
 📂 Project Structure
 Copy
 Edit
-📦 webscraper-wordpress
- ┣ 📜 main.py            # Main script for running the scraper and the post in wordpress
+📦 Sergiproject
+ ┣ 📜 crawler.py            # Main script for posting in wordpress
+ ┣ 📜 functions.py          # Aux script for functions and scrapping
+ ┣ 📜 utilities.py          # Countriy jsons and different utilities  
  ┣ 📜 requirements.txt    # Python dependencies
  ┣ 📜 README.md           # Project documentation (this file)
- ┗ 📜 .env          # Configuration settings (API keys, URLs)
+ ┣ 📜 .env          # Configuration settings (API keys, URLs)
+ ┗ 📂 chambers      # Scripts for the different chambers
 🔧 Setup & Installation
 1️⃣ Prerequisites
 Ensure you have:

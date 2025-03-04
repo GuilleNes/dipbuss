@@ -4,9 +4,13 @@ import re
 import json
 
 def get_us(url, country, events, country_chambers):
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
     driver.get(url)
+    driver.implicitly_wait(20)
     html = driver.page_source
+
     time_regex = r"\d{1,2}:\d{2}"
     soup = BeautifulSoup(html, "html.parser")
 
@@ -14,6 +18,11 @@ def get_us(url, country, events, country_chambers):
     date_list = []
     start_time_list = []
     end_time_list = []
+    img_list = []
+
+    for img_tag in soup.find_all("div", class_="jsx-1143752508 eapp-events-calendar-masonry-item-imageContainer"):
+        img_url = img_tag.find("img").get("src")
+        img_list.append(img_url)
 
     for event_tag in soup.find_all("div",
                                    class_="jsx-401363670 eapp-events-calendar-name-component eapp-events-calendar-masonry-item-name"):
@@ -74,13 +83,15 @@ def get_us(url, country, events, country_chambers):
             end_time = "None"
             end_time_list.append(end_time)
 
-    for title, event_date, start_time, end_time in zip(title_list, date_list, start_time_list, end_time_list):
+    for title, event_date, start_time, end_time, img_url in zip(title_list, date_list, start_time_list, end_time_list,
+                                                                img_list):
         events.append({
             "title": title,
             "date": event_date,
             "start_time": start_time,
             "end_time": end_time,
             "href": "https://www.accj.or.jp/accj-events",
+            "img_url": img_url,
             "url": "https://www.accj.or.jp",
             "chamber": country_chambers[country]
         })

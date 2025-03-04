@@ -2,25 +2,31 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_belgium(url, country, events, country_chambers):
-
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
+    # Extract event images
+    img_list = [img_tag.find("img").get("src") if img_tag.find("img") else "No Image"
+                for img_tag in soup.find_all("div", class_="relative")]
+
+    # Extract event dates
     date_list = []
+    events_tags = soup.find_all("div", class_="tribe-events-calendar-list__event-datetime-wrapper tribe-common-b2")
 
-    for event_tag in soup.find_all("div",
-                                   class_="tribe-events-calendar-list__event-datetime-wrapper tribe-common-b2"):
+    for event_tag in events_tags:
         time_tag = event_tag.find("time", class_="tribe-events-calendar-list__event-datetime")
-        if time_tag and "datetime" in time_tag.attrs:
-            date_list.append(time_tag["datetime"])
+        date_list.append(time_tag["datetime"] if time_tag and "datetime" in time_tag.attrs else "No Date")
 
-    for index, event_tag in enumerate(
-            soup.find_all("a", class_="tribe-events-calendar-list__event-title-link tribe-common-anchor-thin")):
+    # Extract event details
+    event_elements = soup.find_all("a", class_="tribe-events-calendar-list__event-title-link tribe-common-anchor-thin")
+
+    for index, event_tag in enumerate(event_elements):
         title = event_tag.text.strip()
         href = event_tag['href']
+        date = date_list[index] if index < len(date_list) else "No Date"
+        img_url = img_list[index] if index < len(img_list) else "No Image"
 
-        date = date_list[index] if index < len(date_list) else None
-
+        # Extract event time
         time_tag = event_tag.find_next("time", class_="tribe-events-calendar-list__event-datetime")
         start_time, end_time = None, None
 
@@ -70,6 +76,7 @@ def get_belgium(url, country, events, country_chambers):
             "start_time": start_time,
             "end_time": end_time,
             "description": description,
+            "img_url": img_url,
             "url": "https://blccj.or.jp",
             "chamber": country_chambers[country]
         })

@@ -9,7 +9,14 @@ def get_italy(url, country, events, country_chambers):
         response = requests.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
 
-        for event_tag in soup.find_all('div', class_='post-content'):
+        img_list = [
+            img_tag.find("img").get("data-src")
+            for img_tag in soup.find_all('div', class_='img-wrap')
+        ]
+
+        event_tags = soup.find_all('div', class_='post-content')
+
+        for event_tag, img_url in zip(event_tags, img_list):
             title = event_tag.find('h2').get_text(strip=True)
 
             href_tag = event_tag.find('h2').find('a')
@@ -60,6 +67,7 @@ def get_italy(url, country, events, country_chambers):
                 "date": event_date,
                 "start_time": start_time,
                 "end_time": end_time,
+                "img_url": img_url,
                 "url": "https://iccj.or.jp",
                 "chamber": country_chambers[country]
             })

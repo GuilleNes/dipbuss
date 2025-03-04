@@ -7,7 +7,13 @@ def get_switzerland(url, country, events, country_chambers):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
-    for event_tag in soup.find_all("div", class_="em-item-info"):
+    img_list = [
+        img_tag.find("img").get("src")
+        for img_tag in soup.find_all("div",
+                                     class_="em-item-image")
+    ]
+    event_tag = soup.find_all("div", class_="em-item-info")
+    for event_tag, img_url in zip(event_tag, img_list):
         title = event_tag.find('h3').get_text(strip=True)
 
         href_tag = event_tag.find('h3', class_='em-item-title').find('a')
@@ -48,6 +54,7 @@ def get_switzerland(url, country, events, country_chambers):
             "start_time": start_time,
             "end_time": end_time,
             "description": description,
+            "img_url": img_url,
             "url": "https://sccij.jp",
             "chamber": country_chambers[country]
         })

@@ -4,10 +4,8 @@ from datetime import datetime
 
 
 def get_spain(url, country, events, country_chambers):
-
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
-
     img_list = [
         img_tag.find("img").get("src")
         for img_tag in soup.find_all("div",

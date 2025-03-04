@@ -199,6 +199,7 @@ class EventCrawlerPipeline:
                 'timezone': 'Asia/Tokyo',
                 'cost': event.get('cost', ''),
                 'website': event.get('href', ''),
+                'img_url': event.get('img_url', ''),
                 'organizer': [{
                     'organizer': event.get('chamber', ''),
                     'website': event.get('url', ""),

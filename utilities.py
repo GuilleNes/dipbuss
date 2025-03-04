@@ -25,7 +25,7 @@ country_chambers = {
 country_url = {
     "Belgium": "https://blccj.or.jp/events/list",
     "France": "https://www.ccifj.or.jp/en/events/upcoming-events.html",
-    "Deutschland": "https://japan.ahk.de/en/events/coming-events",
+    "Deutschland": "https://japan.ahk.de/en/events/coming-events/page-{}?tx_ahkevents_list%5Bdemand%5D%5BarchiveRestriction%5D=active",  ### We need pagination in this case
     "Switzerland": "https://sccij.jp/events-future/",
     "Italy": "https://iccj.or.jp/upcoming-events/",
     "Canada": "https://www.cccj.or.jp/events",
