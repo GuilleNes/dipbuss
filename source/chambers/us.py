@@ -5,8 +5,14 @@ import json
 
 def get_us(url, country, events, country_chambers):
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Remote(
+        command_executor='http://chromedriver-selenium:4444/wd/hub',
+        options=options
+    )
     driver.get(url)
     driver.implicitly_wait(20)
     html = driver.page_source

@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-from utilities import month_map
+try:
+    from source.utilities import month_map
+except:
+    from utilities import month_map
 
 def get_switzerland(url, country, events, country_chambers):
 

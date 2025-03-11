@@ -19,7 +19,7 @@ country_chambers = {
 }
 
 
-## Here we add the chambers url and country code in order to iterate on each
+## Here we add the chambers url and country source in order to iterate on each
 ## We delete US and UK as we process them with Selenium later
 
 country_url = {

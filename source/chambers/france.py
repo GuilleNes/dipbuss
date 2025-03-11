@@ -2,17 +2,24 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 import time
 
 def get_france(url, country, events, country_chambers):
 
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # Run without opening a browser window
-    driver = webdriver.Chrome(options=options)
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+
+    driver = webdriver.Remote(
+        command_executor='http://chromedriver-selenium:4444/wd/hub',
+        options=options
+    )
+    # driver = webdriver.Chrome(options=options)
     driver.get(url)
     wait = WebDriverWait(driver, 10)
 

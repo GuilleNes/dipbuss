@@ -1,15 +1,24 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from utilities import month_map
+try:
+    from source.utilities import month_map
+except:
+    from utilities import month_map
 from datetime import datetime
 
 def get_uk(url, country, events, country_chambers):
+
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Remote(
+        command_executor='http://chromedriver-selenium:4444/wd/hub',
+        options=options
+    )
     driver.get(url)
     html = driver.page_source
-    driver.quit()
 
     soup = BeautifulSoup(html, "html.parser")
 

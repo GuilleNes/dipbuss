@@ -4,6 +4,7 @@ from requests.auth import HTTPBasicAuth
 import os
 import json
 import time
+import logging
 
 
 ### We import the utilities
@@ -14,7 +15,11 @@ from utilities import country_url_sel
 ### We import the functions
 from functions import get_countries
 
-## Now we execute the code in order to upload everything to the wordpress
+### We get the Dagster libraries
+
+from dagster import job, op, schedule, DefaultScheduleStatus
+
+## Now we execute the source in order to upload everything to the wordpress
 
 
 class EventCrawlerPipeline:
@@ -43,7 +48,10 @@ class EventCrawlerPipeline:
             else:
                 print("No content returned.")
         elif self.wordpress_events_status_code in [400, 403, 404, 500]:
-            print(f"Error fetching events: {response.status_code} - {response.text}")
+            print(f"Error fetching events:  {response.status_code} - {response.text}")
+
+        if not self.wp_url or not self.wp_user or not self.wp_password:
+            raise ValueError("Missing required environment variables: WP_URL, WP_USER, or WP_PASSWORD")
 
     def delete_old_events_wordpress(self):
         """Delete all events before today from WordPress API with pagination."""
@@ -207,6 +215,7 @@ class EventCrawlerPipeline:
                 'show_map': True,
                 'show_map_link': True
             }
+            print(event_data)
 
             try:
                 response = requests.post(self.wp_url, json=event_data, headers=self.headers, auth=self.auth)
@@ -222,7 +231,36 @@ class EventCrawlerPipeline:
         return processed_events
 
 
+@op
+def process_item():
+    pipeline = EventCrawlerPipeline()
+    return pipeline.process_item()
+
+
+@job
+def crawler_job():
+    logging.info("Chambers crawling extraction started")
+    try:
+        process_item()
+        return
+    except Exception as err:
+        logging.error(f"Error in crawler pipeline: {err}")
+        raise
+
+
+@schedule(
+    job=crawler_job,
+    cron_schedule="0 8 * * *",
+    execution_timezone="Japan",
+    default_status=DefaultScheduleStatus.RUNNING
+)
+def crawler_schedule():
+    return {}
+
+
+
 # MAIN: Run locally
 if __name__ == "__main__":
-    pipeline = EventCrawlerPipeline()
-    pipeline.process_item()
+    # pipeline = EventCrawlerPipeline()
+    # pipeline.process_item()
+    crawler_job.execute_in_process(run_config={})
