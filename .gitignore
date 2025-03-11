@@ -1,8 +1,6 @@
-source/.env
+.env
 Untitled.ipynb
 .ipynb_checkpoints
 .idea
 _pycache_
-dockerfiles
-docker_compose.yaml
 source/dagster.yaml

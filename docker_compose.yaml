@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: dockerfiles/dagster_daemon/Dockerfile_dagster
+    container_name: dagster-daemon
+    restart: always
+
+    environment:
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD: dagster
+      POSTGRES_DB: dagster
+
+      WP_URL: ${'WP_URL'}
+      WP_USER: ${'WP_USER'}
+      WP_PASSWORD: ${'WP_PASSWORD'}
+    depends_on:
+      - postgres
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    entrypoint: ["dagster-daemon", "run", "-w", "/opt/dagster/app/dagster/dagster_workspace.yaml"]
+
+  dagit:
+    build:
+      context: .
+      dockerfile: dockerfiles/dagster/Dockerfile_dagster
+    container_name: dagit
+    restart: always
+    working_dir: /opt/dagster
+    command: ["-h", "0.0.0.0", "-p", "3000", "-w", "/opt/dagster/app/dagster/dagster_workspace.yaml"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dagster-daemon
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD: dagster
+      POSTGRES_DB: dagster
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: chromedriver-selenium
+    ports:
+      - "4444:4444"
+    networks:
+      - default
+
+
+volumes:
+  postgres_data:
